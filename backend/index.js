@@ -26,6 +26,32 @@ const httpRequestErrorCount = new promClient.Counter({
   help: 'Total number of errors in HTTP requests'
 });
 
+// frontend metrics
+const pageLoadTime = new promClient.Gauge({
+    name: 'frontend_page_load_time_seconds',
+    help: 'Page load time for the frontend in seconds'
+  });
+  
+  const apiRequestDuration = new promClient.Gauge({
+    name: 'frontend_api_request_duration_seconds',
+    help: 'API request duration for the frontend in seconds'
+  });
+
+// Endpoint to receive frontend metrics
+app.use(express.json());
+app.post('/api/metrics', (req, res) => {
+    const metrics = req.body;
+
+    if (metrics.pageLoadDuration) {
+      pageLoadTime.set(metrics.pageLoadDuration); // Store page load time
+    }
+    if (metrics.apiRequestDuration) {
+      apiRequestDuration.set(metrics.apiRequestDuration); // Store API request duration
+    }
+
+    res.send({ status: 'Metrics received' });
+});
+
 // metrics route for Prometheus scraping
 app.get('/metrics', async (req, res) => {
   try {

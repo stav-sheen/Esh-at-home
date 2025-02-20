@@ -79,6 +79,54 @@ The frontend fetches a hello world message from the backend and displays it.
      docker-compose down
      ```
 
+## Monitoring
+
+This project uses **Prometheus** and **Grafana** to monitor the health and performance of the services.
+
+### Architecture Overview
+- **Prometheus** collects and stores metrics from the backend and frontend.
+- **Grafana** visualizes these metrics.
+
+### Metrics collected and example queries
+- **Backend**:
+  - `http_request_count`: Total requests handled. 
+        Query: http_request_count
+  - `http_request_duration_seconds`: Request latency.
+        Query: rate(http_request_duration_seconds[TIME])
+  - `http_request_error_count`: Error counts.
+        Query: rate(http_request_error_count[TIME])
+  
+- **Frontend**:
+  - `frontend_page_loads`: Page load count.
+    Query: frontend_page_load_duration_seconds
+  - `frontend_api_request_duration_seconds`: API call latency.
+    Query: frontend_api_request_duration_seconds
+
+- **Custom**:
+  - `http_response_time_seconds`: Backend response time.
+
+## HOW-TO: Grafana Dashboard Setup
+
+To visualize metrics collected by Prometheus, follow these steps:
+
+### 1. Install Grafana
+Ensure Grafana is running within your `docker-compose.yml` configuration.
+
+### 2. Set up Prometheus as a Data Source
+- Open Grafana at `http://localhost:3000`.
+- Log in with the default credentials (`admin` / `admin`).
+- Go to **Configuration > Data Sources** and add Prometheus.
+- Set the URL to `http://prometheus:9090` and click **Save & Test**.
+
+### 3. Create a Dashboard
+- Go to **Create > Dashboard** and add a new panel.
+
+### 4. Add Key Metrics
+Use the queries detailed earlier for the panels.
+
+### 5. Save the Dashboard
+Once the panels are added, click **Save** to store your dashboard.
+
 ## Troubleshooting
 
 ### Common Issues:

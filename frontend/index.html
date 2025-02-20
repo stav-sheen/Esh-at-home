@@ -13,7 +13,8 @@
         const frontendMetrics = {
             pageLoadStart: Date.now(),
             apiRequestDuration: null,
-            apiRequestSuccess: false
+            apiRequestSuccess: false,
+            pageLoadDuration: null
         };
 
         // Send metrics to backend (Prometheus scraping endpoint)
@@ -27,8 +28,8 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    pageLoadTime: frontendMetrics.pageLoadDuration,
-                    apiRequestDuration: frontendMetrics.apiRequestDuration
+                    pageLoadDuration: frontendMetrics.pageLoadDuration,
+                    apiRequestDuration: frontendMetrics.apiRequestDuration,
                 })
             }).catch((error) => {
                 console.error('Error sending metrics to backend:', error);
@@ -37,7 +38,7 @@
 
         // Track page load time
         window.addEventListener('load', () => {
-            const pageLoadTime = (Date.now() - frontendMetrics.pageLoadStart) / 1000; // seconds
+            const pageLoadTime = (Date.now() - frontendMetrics.pageLoadStart) / 1000; // in seconds
             frontendMetrics.pageLoadDuration = pageLoadTime;
 
             console.log('Page load time:', pageLoadTime, 'seconds');
@@ -63,7 +64,7 @@
             })
             .finally(() => {
                 const apiRequestEnd = Date.now();
-                frontendMetrics.apiRequestDuration = (apiRequestEnd - apiRequestStart) / 1000; // seconds
+                frontendMetrics.apiRequestDuration = (apiRequestEnd - apiRequestStart) / 1000; // in seconds
                 console.log('API request duration:', frontendMetrics.apiRequestDuration, 'seconds');
 
                 sendMetricsToBackend(); // Send the API request duration metric to the backend
