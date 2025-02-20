@@ -42,11 +42,7 @@ The frontend fetches a hello world message from the backend and displays it.
    - Built using Node.js with the Express framework to provide a simple API endpoint (`/api/message`).
    - CORS is used to allow requests.
 
-3. **Containerization**:
-   - Both frontend and backend are Dockerized.
-   - Docker Compose is used to manage and ensure communication for both containers on a shared network (`esh-app`).
-
-4. **Networking**:
+3. **Networking**:
    - The containers are connected via a Docker network to allow the frontend to access the backend using the service name `backend` as the hostname.
 
 ## Local Development Guide
@@ -135,14 +131,14 @@ Once the panels are added, click **Save** to store your dashboard.
    - Ensure that the `frontend/index.html` file is configured to fetch from the correct backend URL.
    - If you are running the frontend in the browser, use `http://localhost:3000` instead of `backend:3000`.
 
-3. **Backend Not Accessible**:
+2. **Backend Not Accessible**:
    - Make sure that the backend container is up and running. Use `docker-compose ps` to check the status.
    - Try accessing the backend directly via `curl http://localhost:3000/api/message` to ensure the backend is working.
 
-4. **Port Conflicts**:
+3. **Port Conflicts**:
    - Ensure that the ports `3000` (backend) and `8080` (frontend) are not already in use by other services on your machine.
 
-5. **Rebuilding Containers**:
+4. **Rebuilding Containers**:
    - If you make changes to the code, make sure to rebuild the containers:
      ```bash
      docker-compose down
