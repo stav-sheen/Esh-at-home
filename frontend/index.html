@@ -7,15 +7,66 @@
 </head>
 <body>
     <h1 id="message">Loading...</h1>
+
     <script>
+        // Define global object to collect metrics
+        const frontendMetrics = {
+            pageLoadStart: Date.now(),
+            apiRequestDuration: null,
+            apiRequestSuccess: false
+        };
+
+        // Send metrics to backend (Prometheus scraping endpoint)
+        const sendMetricsToBackend = () => {
+            const backendUrl = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'http://backend:3000';
+
+            // Send metrics to the backend
+            fetch(`${backendUrl}/api/metrics`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    pageLoadTime: frontendMetrics.pageLoadDuration,
+                    apiRequestDuration: frontendMetrics.apiRequestDuration
+                })
+            }).catch((error) => {
+                console.error('Error sending metrics to backend:', error);
+            });
+        };
+
+        // Track page load time
+        window.addEventListener('load', () => {
+            const pageLoadTime = (Date.now() - frontendMetrics.pageLoadStart) / 1000; // seconds
+            frontendMetrics.pageLoadDuration = pageLoadTime;
+
+            console.log('Page load time:', pageLoadTime, 'seconds');
+
+            sendMetricsToBackend(); // Send the page load metric to the backend
+        });
+
         const backendUrl = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'http://backend:3000';
-        
+
+        // Track API request duration
+        const apiRequestStart = Date.now();
+
         fetch(`${backendUrl}/api/message`)
             .then(response => response.json())
-            .then(data => document.getElementById('message').innerText = data.message)
+            .then(data => {
+                document.getElementById('message').innerText = data.message;
+                frontendMetrics.apiRequestSuccess = true;
+            })
             .catch((error) => {
                 console.error('Error fetching message:', error);
                 document.getElementById('message').innerText = 'Error';
+                frontendMetrics.apiRequestSuccess = false;
+            })
+            .finally(() => {
+                const apiRequestEnd = Date.now();
+                frontendMetrics.apiRequestDuration = (apiRequestEnd - apiRequestStart) / 1000; // seconds
+                console.log('API request duration:', frontendMetrics.apiRequestDuration, 'seconds');
+
+                sendMetricsToBackend(); // Send the API request duration metric to the backend
             });
     </script>
 </body>
